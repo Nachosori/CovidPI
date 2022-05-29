@@ -6,5 +6,5 @@ class Country(BaseModel):
 class UpdateCountryName(BaseModel):
     country:str
   
-class UpdateConfirmedData(BaseModel):
+class UpdateData(BaseModel):
     number:str

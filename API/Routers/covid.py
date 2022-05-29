@@ -3,7 +3,7 @@ from tokenize import Name
 from fastapi import APIRouter, Body, Header
 from database.mongodb import db
 from bson import json_util
-from models.countries import Country, UpdateConfirmedData, UpdateCountryName
+from models.countries import Country, UpdateData, UpdateCountryName, UpdateData
 from json import loads
 
 
@@ -35,6 +35,8 @@ def get_all_dates():
         aux.append(i.keys())
     return loads(json_util.dumps(aux))
 
+# Devuelve casos confirmados en un rango de tiempo.
+
 @router.get("/confirmed/dates/{country}/{start}/{end}")
 def get_coonfirmated_dates_range(country, start,end):
     start = start.replace(".", "/")
@@ -48,6 +50,8 @@ def get_coonfirmated_dates_range(country, start,end):
         if end in list(fechas[0]["confirmed"][indice].keys()):
             end = indice
     return loads(json_util.dumps(fechas[0]["confirmed"][start:end]))
+
+# Devuelve casos confirmados en un dia.
 
 @router.get("/confirmed/day/{country}/{start}")
 def get_coonfirmated_dates(country, start):
@@ -174,24 +178,67 @@ def update_country(name:str,country:UpdateCountryName):
         "message":"Actualizado correctamente"
         }
 
- 
-# No consigo cambiar los datos de replace
 
-
-# @router.put("/confirm/data/{name}/{fecha}")
-# def update_confirmed_number(name:str,date:UpdateConfirmedData,fecha:str):
-#     fecha = fecha.replace(".", "/")
-#     date = date.dict()
-#     date = list(date.values())[0]
-#     date = date.split("-")
-#     filt = {"country":name}
-#     project = {"_id":0,"confirmed":1}
-#     lista = list(db["covidpi"].find({"country":name}).distinct(f"confirmed.{fecha}"))
-#     print(lista)
-#     list_fechas = list(db["covidpi"].find(filt,project))
-#     list_fechas = list_fechas[0]["confirmed"]
-#     print(list_fechas.index({"1/22/20":0}))
-#     # db["covidpi"].update_one({"country":name}, {"$set":{f"confirmed.{index}": date_dict}})
-#     return {
-#         "message":"Actualizado correctamente"
+@router.put("/confirm/data/{name}/{date}")
+def update_confirmed_number(name:str,new_date:UpdateData,date:str):
+    date = date.replace(".", "/")
+    date_value = list(db["covidpi"].find({"country":name}).distinct(f"confirmed.{date}"))
+    new_date = new_date.dict()
+    new_date = list(new_date.values())[0]
+    new_date = new_date.split("-")
+    new_date_dict= {new_date[0]:int(new_date[1])}
+    filt = {"country":name}
+    project = {"_id":0,"confirmed":1}
+    list_fechas = list(db["covidpi"].find(filt,project))
+    list_fechas = list_fechas[0]["confirmed"]
+    index_date = list_fechas.index({date:date_value[0]})
+    db["covidpi"].update_one({"country":name}, {"$set":{f"confirmed.{index_date}": new_date_dict}})
+    return {
+        "message":"Actualizado correctamente"
         }
+
+@router.put("/recover/data/{name}/{date}")
+def update_confirmed_number(name:str,new_date:UpdateData,date:str):
+    date = date.replace(".", "/")
+    date_value = list(db["covidpi"].find({"country":name}).distinct(f"recovered.{date}"))
+    new_date = new_date.dict()
+    new_date = list(new_date.values())[0]
+    new_date = new_date.split("-")
+    new_date_dict= {new_date[0]:int(new_date[1])}
+    filt = {"country":name}
+    project = {"_id":0,"recovered":1}
+    list_fechas = list(db["covidpi"].find(filt,project))
+    list_fechas = list_fechas[0]["recovered"]
+    index_date = list_fechas.index({date:date_value[0]})
+    db["covidpi"].update_one({"country":name}, {"$set":{f"recovered.{index_date}": new_date_dict}})
+    return {
+        "message":"Actualizado correctamente"
+        }
+
+@router.put("/fatal/data/{name}/{date}")
+def update_confirmed_number(name:str,new_date:UpdateData,date:str):
+    date = date.replace(".", "/")
+    date_value = list(db["covidpi"].find({"country":name}).distinct(f"death.{date}"))
+    new_date = new_date.dict()
+    new_date = list(new_date.values())[0]
+    new_date = new_date.split("-")
+    new_date_dict= {new_date[0]:int(new_date[1])}
+    filt = {"country":name}
+    project = {"_id":0,"death":1}
+    list_fechas = list(db["covidpi"].find(filt,project))
+    list_fechas = list_fechas[0]["death"]
+    index_date = list_fechas.index({date:date_value[0]})
+    db["covidpi"].update_one({"country":name}, {"$set":{f"death.{index_date}": new_date_dict}})
+    return {
+        "message":"Actualizado correctamente"
+        }
+
+# Delete
+
+@router.delete("/delete/country")
+def add_country(country:Country):
+    print(country)
+    db["covidpi"].remove(country.dict())
+    return {
+        "message":"Eliminado correctamente"
+    }

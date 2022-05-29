@@ -3,8 +3,9 @@ import plotly as pio
 import plotly.graph_objects as go
 import plotly.express as px
 import matplotlib.pyplot as plt
+import seaborn as sns
 import numpy as np
-import base64
+
 
 
 
@@ -51,6 +52,7 @@ def radar_plot(values, name,theta):
 
 
 def covid_graph(courses,values):
+    sns.set_style("whitegrid")
     plt.figure(figsize=[10,8])
     plt.bar(courses, values, width = 0.5, color=("red","green","grey"))
     plt.grid(axis='y', alpha=0.75)
@@ -62,9 +64,22 @@ def covid_graph(courses,values):
     plt.show()
     return plt
 
+def covid_pie_graf(courses,values):
+    sns.set_style("whitegrid")
+    labels = courses
+    sizes = values
+    explode = (0.1, 0, 0)  
+    fig1, ax1 = plt.subplots()
+    ax1.pie(sizes, explode=explode, labels=labels, autopct='%1.1f%%',
+            shadow=True, startangle=90)
+    ax1.axis('equal')  
+    plt.show()
+    return plt
+
 
 
 def covid_graph_horizon(courses,value1,value2,value3):
+    sns.set_style("whitegrid")
     fig, ax = plt.subplots()
     countries = courses
     width = 0.2
@@ -82,12 +97,9 @@ def covid_graph_horizon(courses,value1,value2,value3):
     return plt
 
 
-
 def check_password():
-    """Returns `True` if the user had a correct password."""
 
     def password_entered():
-        """Checks whether a password entered by the user is correct."""
         if (
             st.session_state["username"] in st.secrets["passwords"]
             and st.session_state["password"]
@@ -113,16 +125,6 @@ def check_password():
         st.error("😕 User not known or password incorrect")
         return False
     else:
-        # Password correct.
         return True
 
 
-def ResponseModel(data, message):
-    return {
-        "data": [data],
-        "code": 200,
-        "message": message,
-    }
-
-def ErrorResponseModel(error, code, message):
-    return {"error": error, "code": code, "message": message}
