@@ -1,6 +1,7 @@
 import folium
 import streamlit as st
 import seaborn as sns
+import time
 import plotly as pio
 import plotly.graph_objects as go
 import plotly.express as px
@@ -29,7 +30,7 @@ def administrator_menu():
         options=["Enter data", "Change data","Deletes data"],
         icons=["geo", "search", "archive"],
         menu_icon="cast",
-        default_index=2,
+        default_index=0,
         orientation="horizontal",
         styles={
         "container": {"padding": "0!important", "background-color": " #ffffff"},
@@ -48,6 +49,9 @@ def administrator_menu():
             }
             if st.button("Send"):
                 post_add_countries(dic_name)
+                with st.spinner('Wait for it...'):
+                    time.sleep(3)
+                    st.success('The country has been added to the database.')
 
         if selec_options == "Change data":
 
@@ -62,6 +66,9 @@ def administrator_menu():
                 }
                 if st.button("Send", key=1):
                     upd_name_country(chosen_one,dic_name)
+                    with st.spinner('Wait for it...'):
+                        time.sleep(3)
+                        st.success('The name has been changed correctly.')
 
             if selec_option == "No":
                 slider_one = st.select_slider("Select date", days, key=3)
@@ -86,6 +93,7 @@ def administrator_menu():
                 dic_death = { "number" : slider_one+"-"+death_number}
                 if st.button("Send",key=4):
                     upd_death_date(chosen_one,date,dic_death)
+                 
         
         if selec_options == "Deletes data":
 
@@ -95,6 +103,8 @@ def administrator_menu():
                 "country":deleted_country
             }
             if st.button("Send", key=5):
-
                 del_delete_country(dic_delete_name)
+                with st.spinner('Wait for it...'):
+                    time.sleep(3)
+                    st.success('The country has been removed from the database.')
 

@@ -29,7 +29,7 @@ with st.sidebar:
         options=["Home", "Analysis by Country", "Analysis by multiples countries", "Administrator menu"],
         icons=["house", "search", "archive", "lock"],
         menu_icon="cast",
-        default_index=2,
+        default_index=0,
         styles={
         "container": {"padding": "0!important", "background-color": " #f3f3f3"},
         "icon": {"color": "grey", "font-size": "20px"}, 
